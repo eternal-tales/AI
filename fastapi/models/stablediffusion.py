@@ -1,5 +1,4 @@
 # Model Download
-
 import os
 import requests
 import wget
@@ -12,8 +11,6 @@ from subprocess import check_output
 from IPython.display import clear_output
 import time
 import shutil
-
-# 오류 시 gdrive 부분 수정 필요
 
 
 def getsrc(url):
@@ -57,26 +54,20 @@ def get_name(url, gdrive):
 
 # @markdown - Skip this cell if you are loading a previous session that contains a trained model.
 
-# @markdown ---
-
-
-Model_Version = "1.5"  # @param [ "1.5", "V2.1-512px", "V2.1-768px"]
 
 # @markdown - Choose which version to finetune.
-
-# with capture.capture_output() as cap:
-#    os.chdir('/content')
-
-# @markdown ---
+Model_Version = "1.5"  # @param [ "1.5", "V2.1-512px", "V2.1-768px"]
 
 # @param {type:"string"}
 Path_to_HuggingFace = "runwayml/stable-diffusion-v1-5"
 
-# @markdown - Load and finetune a model from Hugging Face, use the format "profile/model" like : runwayml/stable-diffusion-v1-5
-# @markdown - If the custom model is private or requires a token, create token.txt containing the token in "Fast-Dreambooth" folder in your gdrive.
+# with capture.capture_output() as cap:
+#    os.chdir('/content')
+
+# Load and finetune a model from Hugging Face, use the format "profile/model" like : runwayml/stable-diffusion-v1-5
+# If the custom model is private or requires a token, create token.txt containing the token in "Fast-Dreambooth" folder in your gdrive.
 
 MODEL_PATH = ""  # @param {type:"string"}
-
 MODEL_LINK = ""  # @param {type:"string"}
 
 

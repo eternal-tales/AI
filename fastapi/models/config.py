@@ -1,8 +1,11 @@
 # Set dependency
 
+# diffusers 모델 직접 다운로드 받는 것으로 대체
+
 import subprocess
 import os
 import shutil
+import requests
 
 
 def install_dependencies():
@@ -18,10 +21,12 @@ def install_dependencies():
 
     # Download and install Debian packages and other dependencies
     subprocess.run(
-        ['wget', '-q', '-i', 'https://raw.githubusercontent.com/TheLastBen/fast-stable-diffusion/main/Dependencies/dbdeps.txt'], check=True)
+        ['wget', '-q', '-i', 'https://raw.githubusercontent.com/TheLastBen/fast-stable-diffusion/main/Dependencies/dbdeps.txt'], check=True, shell=True)
     subprocess.run(['dpkg', '-i', '*.deb'], shell=True, check=True)
+
     subprocess.run(['tar', '-C', '/', '--zstd', '-xf',
                    'gcolabdeps.tar.zst'], check=True)
+
     for file in os.listdir():
         if file.endswith('.deb') or file.endswith('.zst') or file.endswith('.txt'):
             os.remove(file)

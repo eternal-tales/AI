@@ -4,58 +4,28 @@ import subprocess
 import time
 import wget
 from subprocess import check_output
+from os import listdir
 
 # Create/Load a Session
 
-Session_Name = ""  # param{type: 'string'} - 수정 필요
-MODEL_NAME = ""  # param{type: 'string'} - 수정 필요
-
-WORKSPACE = '/content/Fast-Dreambooth'
-SESSION_DIR = f"{WORKSPACE}/Sessions/{Session_Name}"
-
-'''
-try:
-  MODEL_NAME
-  pass
-except:
-  MODEL_NAME=""
-'''
-
+Session_Name = "test0"  # param{type: 'string'}
+MODEL_NAME = ""  # param{type: 'string'}
 PT = ""
 
 while Session_Name == "":
     print('[1;31mInput the Session Name:')
     Session_Name = input('')
 Session_Name = Session_Name.replace(" ", "_")
+print(f"Session Name is {Session_Name}")
 
-# @markdown - Enter the session name, it if it exists, it will load it, otherwise it'll create an new session.
-
+# Enter the session name, it if it exists, it will load it, otherwise it'll create an new session.
 Session_Link_optional = ""  # @param{type: 'string'}
-
-# @markdown - Import a session from another gdrive, the shared gdrive link must point to the specific session's folder that contains the trained CKPT, remove any intermediary CKPT if any.
+# Import a session from another gdrive, the shared gdrive link must point to the specific session's folder that contains the trained CKPT, remove any intermediary CKPT if any.
 
 WORKSPACE = '/content/Fast-Dreambooth'
 
-'''
-if Session_Link_optional !="":
-  print('[1;32mDownloading session...')
-  with capture.capture_output() as cap:
-    %cd /content
-    if not os.path.exists(str(WORKSPACE+'/Sessions')):
-      %mkdir -p $WORKSPACE'/Sessions'
-      time.sleep(1)
-    %cd $WORKSPACE'/Sessions'
-    !gdown --folder --remaining-ok -O $Session_Name  $Session_Link_optional
-    %cd $Session_Name
-    !rm -r instance_images
-    !unzip instance_images.zip
-    !rm -r captions
-    !unzip captions.zip
-    %cd /content
-'''
-
-
 INSTANCE_NAME = Session_Name
+
 OUTPUT_DIR = "/content/models/"+Session_Name
 SESSION_DIR = WORKSPACE+'/Sessions/'+Session_Name
 INSTANCE_DIR = SESSION_DIR+'/instance_images'
@@ -93,12 +63,6 @@ if os.path.exists(str(SESSION_DIR)):
             print('[1;32mSkipping the intermediary checkpoints.')
         del n
 
-'''
-with capture.capture_output() as cap:
-  %cd /content
-  resume=False
-'''
-
 if os.path.exists(str(SESSION_DIR)) and not os.path.exists(MDLPTH):
     print('[1;32mLoading session with no previous model, using the original model or the custom downloaded model')
     if MODEL_NAME == "":
@@ -126,22 +90,6 @@ elif os.path.exists(MDLPTH):
         subprocess.run(['python', '/content/diffusers/scripts/convert_original_stable_diffusion_to_diffusers.py',
                         '--checkpoint_path', MDLPTH, '--dump_path', OUTPUT_DIR, '--original_config_file', config_yaml_path])
         os.remove(config_yaml_path)  # Remove the config file after use
-
-    elif Model_Version == 'V2.1-512px':
-        convert_script_url = 'https://raw.githubusercontent.com/TheLastBen/fast-stable-diffusion/main/Dreambooth/convertodiffv2.py'
-        convert_script_path = wget.download(convert_script_url)
-        print('\033[1;32mSession found, loading the trained model ...')
-        subprocess.run(['python', convert_script_path, MDLPTH, OUTPUT_DIR,
-                       '--v2', '--reference_model', 'stabilityai/stable-diffusion-2-1-base'])
-        os.remove(convert_script_path)  # Remove the convert script after use
-
-    elif Model_Version == 'V2.1-768px':
-        convert_script_url = 'https://github.com/TheLastBen/fast-stable-diffusion/raw/main/Dreambooth/convertodiffv2-768.py'
-        convert_script_path = wget.download(convert_script_url)
-        print('\033[1;32mSession found, loading the trained model ...')
-        subprocess.run(['python', convert_script_path, MDLPTH, OUTPUT_DIR,
-                       '--v2', '--reference_model', 'stabilityai/stable-diffusion-2-1'])
-        os.remove(convert_script_path)  # Remove the convert script after use
 
     if os.path.exists(OUTPUT_DIR+'/unet/diffusion_pytorch_model.bin'):
         resume = True
