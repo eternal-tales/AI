@@ -1,3 +1,3 @@
 # ai
 
-순서: config(dependency) - model download - dreambooth - instance images(생략 가능) - training - inference (generate)
+GPU 없는 학부생 따리의 눈물나는 삽질기
