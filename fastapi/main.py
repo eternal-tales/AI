@@ -1,18 +1,91 @@
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi.models import FastAPI, File, UploadFile, HTTPException
+from typing import List
+import base64
+import aiofiles
+import os
 
-import generate
-import schema
+from schema import AgentInput, AgentOutput, ChatInput, ChatOutput
+import models.config
+import models.dreambooth
+import models.generate
+import models.preprocess
+import models.stablediffusion
+import models.train
 
 app = FastAPI()
 
 # ---------------------------------------------------------------------------
 
-# Dependency
-
-# USER_NOT_FOUND = HTTPException(
-#    status_code=400, detail="User not found.")  # FAIL
+# Dependency (우선 생략)
 
 # -----------------------------------------------------------------------------
+
+# PART 1. Pet Agent Modelling
+# 1-1. 이미지 받아오기 (생략)
+
+# 1-2. 받은 이미지 5장으로 모델 '학습' 및 '저장' (체크포인트는 별도로 return 하지 않고, 바로 저장 가능)
+@app.post("/train-model", response_model=AgentOutput)
+async def train_model(files: List[UploadFile] = File(...)):
+    if len(files) != 5:
+        raise HTTPException(
+            status_code=400, detail="반드시 5장을 업로드해주세요.")
+
+    # 임시 저장 공간
+    saved_files = []
+    try:
+        for file in files:
+            async with aiofiles.open(f'tmp/{file.filename}', 'wb') as out_file:
+                content = await file.read()
+                await out_file.write(content)
+            saved_files.append(f'tmp/{file.filename}')
+
+        # (1) Config
+        models.config.install_dependencies()
+
+        # (2) Model Download - 작성 필요 (각 모듈 함수로 감싸줘야 한다.)
+
+        # (3) DreamBooth - 작성 필요
+
+        # (4) Preprocess - 작성 필요
+
+        # (5) Train - 작성 필요
+
+        # 모델 체크포인트 경로 - 작성 필요
+        ckpt_path = train_module.train(saved_files)
+        
+        # 학습한 후, 사용된 소스 이미지들 삭제
+        for file_path in saved_files:
+            os.remove(file_path)
+        return AgentOutput(ckpt=ckpt_path)
+
+    except Exception as e:
+        # 오류 발생
+        for file_path in saved_files:
+            os.remove(file_path)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# -----------------------------------------------------------------------------
+
+# PART 2. Image Generating
+# 2-1. 모델 로드 및 학습된 쳌포 플러그인
+@app.get("/load-model")
+async def load_model(ckpt: str):
+    model = # 작성 필요
+    # 별도의 return 값 없음
+
+# 2-2. 이미지 생성 후 전송
+# 트리거 시나리오 선택 > 해당 프롬프트 넣어 생성
+@app.post("/generate-image", response_model=ChatOutput)
+async def generate_image(msg: str):
+    output_image = # 작성 필요 (msg))
+    
+    # 생성파트까지만 작성, S3 전송 파트는 별도로 구현
+    
+    
+        
+# -----------------------------------------------------------------------------
+
 
 # ENDPOINTS
 # 기능에 따른 순서는 결국
@@ -28,53 +101,4 @@ app = FastAPI()
 # 1) 사용자의 발화 GET / GET  신경 X
 # 2) 랜덤한 상황의 프롬프트가 미리 필요, 해당 프롬프트와 가장 유사한(알고리즘 따라) 프롬프트 GET
 # 3) (모델 유지에 대해서) 해당 프롬프트에 대한 이미지 생성
-# 4) 생성한 이미지를 S3에 저장 / 일단 저장장
-
-
-@app.post("/users", response_model=schemas.User)
-def create_user(user: schemas.User, db: Session = Depends(get_db)):
-    db_user = crud.create_user(db=db, user=user)
-    return db_user
-
-# 전체 조회
-
-
-@app.get("/users", response_model=list[schemas.User])
-def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    users = crud.get_users(db=db, skip=skip, limit=limit)
-    return users
-
-# 특정 조회
-
-
-@app.get("/users/{user_id}", response_model=schemas.User)
-def read_user(user_id: int, db: Session = Depends(get_db)):
-    db_user = crud.get_user(db=db, user_id=user_id)
-    if db_user is None:
-        raise USER_NOT_FOUND
-    return db_user
-
-# 특정 수정 (id 는 수정 불가)
-
-
-@app.put("/users/{user_id}", response_model=schemas.CompleteResponse)
-def update_user(user_id: int, user_data: schemas.UserUpdate, db: Session = Depends(get_db)):  # 수정 필요
-    # 체크
-    db_user = crud.get_user(db=db, user_id=user_id)
-    if db_user is None:
-        raise USER_NOT_FOUND
-    action = crud.update_user(
-        db=db, user_id=user_id, name=user_data.name, age=user_data.age, role=user_data.role)
-    return action
-
-# 특정 삭제
-
-
-@app.delete("/users/{user_id}", response_model=schemas.CompleteResponse)
-def delete_user(user_id: int, db: Session = Depends(get_db)):
-    # 체크
-    db_user = crud.get_user(db=db, user_id=user_id)
-    if db_user is None:
-        raise USER_NOT_FOUND
-    action = crud.delete_user(db=db, user_id=user_id)
-    return action
+# 4) 생성한 이미지를 S3에 저장 / 일단 저장

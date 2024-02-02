@@ -1,5 +1,5 @@
 # DevKor 회원관리 시스템
-from fastapi import FastAPI, HTTPException
+from fastapi.models import FastAPI, HTTPException
 from pydantic import BaseModel
 
 app = FastAPI()
