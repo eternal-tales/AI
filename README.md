@@ -1,3 +1,7 @@
-# ai
+# AI ( Multi-modal Chatbot )
 
-GPU 없는 학부생 따리의 눈물나는 삽질기
+## 1. Baseline Model
+- Text Generation: OpenAI GPT (Chat) API 
+- Image Generation: Dreambooth Fast Stable Diffusion
+
+... writing ... 
