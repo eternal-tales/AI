@@ -70,4 +70,5 @@ Real-time Text and Image generation corresponding to user's message
 <br>
 
 ---
-(Last Update: 2024/02/10)
+(Last Update: 2024/02/10) <br>
+Contact: dhdbsrlw@korea.ac.kr
